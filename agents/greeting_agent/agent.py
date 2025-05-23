@@ -164,7 +164,7 @@ class GreetingAgent:
             name="greeting_orchestrator",                  # internal name
             description="Orchestrates time fetching and generates poetic greetings.",
             instruction=system_instr,                      # system prompt
-            tools=tools,                                   # available tools
+            # tools=tools,                                   # available tools
         )
 
 

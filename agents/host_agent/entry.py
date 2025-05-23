@@ -34,7 +34,7 @@ logger = logging.getLogger(__name__)
     help="Host to bind the OrchestratorAgent server to"
 )
 @click.option(
-    "--port", default=10002,
+    "--port", default=10000,
     help="Port for the OrchestratorAgent server"
 )
 @click.option(

@@ -62,7 +62,8 @@ class DiscoveryClient:
             # Open the file at self.registry_file in read mode
             with open(self.registry_file, "r") as f:
                 # Parse the entire file as JSON
-                data = json.load(f)
+                data = list(json.load(f).values())
+                print("data_____________", data)
             # Ensure the JSON is a list, not an object or other type
             if not isinstance(data, list):
                 raise ValueError("Registry file must contain a JSON list of URLs.")
