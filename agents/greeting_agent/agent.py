@@ -36,12 +36,7 @@ logger = logging.getLogger(__name__)
 
 class GreetingAgent:
     """
-    🧠 Orchestrator “meta-agent” that:
-      - Provides two LLM tools: list_agents() and call_agent(...)
-      - On a “greet me” request:
-          1) Calls list_agents() to see which agents are up
-          2) Calls call_agent("TellTimeAgent", "What is the current time?")
-          3) Crafts a 2–3 line poetic greeting referencing that time
+    Agent for greeting
     """
 
     # Declare which content types this agent accepts by default
@@ -144,12 +139,7 @@ class GreetingAgent:
 
         # --- System instruction for the LLM ---
         system_instr = (
-            "You have two tools:\n"
-            "1) list_agents() → returns metadata for all available agents.\n"
-            "2) call_agent(agent_name: str, message: str) → fetches a reply from that agent.\n"
-            "When asked to greet, first call list_agents(), then "
-            "call_agent('TellTimeAgent','What is the current time?'), "
-            "then craft a 2–3 line poetic greeting referencing that time."
+            "You have only one task: to greet and communicate with users."
         )
 
         # Wrap our Python functions into ADK FunctionTool objects

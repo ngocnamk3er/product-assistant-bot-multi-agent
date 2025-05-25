@@ -1,0 +1,5 @@
+{
+    "greeting_agent" : "http://greeting_agent_svc:10001",
+    "telltime_agent" : "http://telltime_agent_svc:10002",
+    "event_introduction_agent" : "http://event_introduction_agent_svc:10003"
+}

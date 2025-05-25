@@ -15,7 +15,7 @@
 # -----------------------------------------------------------------------------
 # Imports
 # -----------------------------------------------------------------------------
-
+import os              # For reading environment variables
 # Your custom A2A server class
 from server.server import A2AServer
 
@@ -51,7 +51,7 @@ def main(host, port):
     This function sets up everything needed to start the agent server.
     You can run it via: `python -m agents.google_adk --host 0.0.0.0 --port 12345`
     """
-
+    public_hostname = os.getenv("AGENT_PUBLIC_HOSTNAME", host)
     # Define what this agent can do – in this case, it does NOT support streaming
     capabilities = AgentCapabilities(streaming=False)
 
@@ -68,13 +68,24 @@ def main(host, port):
     agent_card = AgentCard(
         name="EventIntroductionAgent",                               # Name of the agent
         description="Respond to information about upcoming events.",  # Description
-        url=f"http://{host}:{port}/",                       # The public URL where this agent lives
+        url=f"http://{public_hostname}:{port}/",                       # The public URL where this agent lives
         version="1.0.0",                                    # Version number
         defaultInputModes=EventIntroductionAgent.SUPPORTED_CONTENT_TYPES,  # Input types this agent supports
         defaultOutputModes=EventIntroductionAgent.SUPPORTED_CONTENT_TYPES, # Output types it produces
         capabilities=capabilities,                          # Supported features (e.g., streaming)
         skills=[skill]                                      # List of skills it supports
     )
+
+    # agent_card = AgentCard(
+    #     name="GreetingAgent",                              # Agent identifier
+    #     description="Agent that greets you based on the current time",
+    #     url=f"http://{public_hostname}:{port}/",                      # Base URL for discovery
+    #     version="1.0.0",                                   # Semantic version
+    #     defaultInputModes=["text"],                        # Accepts plain text
+    #     defaultOutputModes=["text"],                       # Produces plain text
+    #     capabilities=capabilities,                         # Streaming disabled
+    #     skills=[skill]                                     # List of skills
+    # )
 
     # Start the A2A server with:
     # - the given host/port

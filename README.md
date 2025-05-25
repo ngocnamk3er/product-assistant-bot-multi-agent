@@ -88,7 +88,7 @@ version_3_multi_agent/
 **Start the TellTimeAgent**
 ```bash
 python -m agents.tell_time_agent \
-  --host localhost --port 10000
+  --host localhost --port 10002
 ```
 
 **Start the GreetingAgent**
@@ -100,7 +100,7 @@ python -m agents.greeting_agent \
 **Start the Orchestrator (Host) Agent**
 ```bash
 python -m agents.host_agent.entry \
-  --host localhost --port 10002
+  --host localhost --port 10000
 ```
 
 **Launch the CLI (cmd.py)**

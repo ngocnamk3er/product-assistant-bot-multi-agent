@@ -7,7 +7,7 @@
 # - Wraps the GreetingAgent logic in a GreetingTaskManager
 # - Listens for incoming tasks on a configurable host and port
 # =============================================================================
-
+import os                             # For reading environment variables
 import logging                        # Standard Python module for logging
 import click                          # Library for building command-line interfaces
 
@@ -55,7 +55,7 @@ def main(host: str, port: int):
     """
     # Print a friendly banner so the user knows the server is starting
     print(f"\n🚀 Starting GreetingAgent on http://{host}:{port}/\n")
-
+    public_hostname = os.getenv("AGENT_PUBLIC_HOSTNAME", host)
     # -------------------------------------------------------------------------
     # 1) Define the agent’s capabilities
     # -------------------------------------------------------------------------
@@ -91,7 +91,7 @@ def main(host: str, port: int):
     agent_card = AgentCard(
         name="GreetingAgent",                              # Agent identifier
         description="Agent that greets you based on the current time",
-        url=f"http://{host}:{port}/",                      # Base URL for discovery
+        url=f"http://{public_hostname}:{port}/",                      # Base URL for discovery
         version="1.0.0",                                   # Semantic version
         defaultInputModes=["text"],                        # Accepts plain text
         defaultOutputModes=["text"],                       # Produces plain text

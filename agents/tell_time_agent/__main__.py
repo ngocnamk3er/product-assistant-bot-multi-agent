@@ -15,7 +15,7 @@
 # -----------------------------------------------------------------------------
 # Imports
 # -----------------------------------------------------------------------------
-
+import os              # For reading environment variables
 # Your custom A2A server class
 from server.server import A2AServer
 
@@ -51,7 +51,7 @@ def main(host, port):
     This function sets up everything needed to start the agent server.
     You can run it via: `python -m agents.google_adk --host 0.0.0.0 --port 12345`
     """
-
+    public_hostname = os.getenv("AGENT_PUBLIC_HOSTNAME", host)
     # Define what this agent can do – in this case, it does NOT support streaming
     capabilities = AgentCapabilities(streaming=False)
 
@@ -68,7 +68,7 @@ def main(host, port):
     agent_card = AgentCard(
         name="TellTimeAgent",                               # Name of the agent
         description="This agent replies with the current system time.",  # Description
-        url=f"http://{host}:{port}/",                       # The public URL where this agent lives
+        url=f"http://{public_hostname}:{port}/",                       # The public URL where this agent lives
         version="1.0.0",                                    # Version number
         defaultInputModes=TellTimeAgent.SUPPORTED_CONTENT_TYPES,  # Input types this agent supports
         defaultOutputModes=TellTimeAgent.SUPPORTED_CONTENT_TYPES, # Output types it produces

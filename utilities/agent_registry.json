@@ -1,6 +1,6 @@
 {
-    "telltime_agent" : "http://localhost:10002",
-    "greeting_agent" : "http://localhost:10001",
     "host_agent" : "http://localhost:10000",
+    "greeting_agent" : "http://localhost:10001",
+    "telltime_agent" : "http://localhost:10002",
     "event_introduction_agent" : "http://localhost:10003"
 }

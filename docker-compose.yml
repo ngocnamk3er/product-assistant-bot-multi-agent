@@ -1,0 +1,170 @@
+# docker-compose.yml (Combined)
+version: "3.8" # Sử dụng phiên bản cao hơn
+
+services:
+  # ---- Agent Services ----
+  greeting_agent_svc:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: agents.greeting_agent --host 0.0.0.0 --port 10001
+    environment:
+      - AGENT_PUBLIC_HOSTNAME=greeting_agent_svc
+    ports:
+      - "10001:10001"
+    volumes:
+      - .:/app
+    networks: # Thêm vào network chung
+      - milvus_compose_network # Đổi tên network cho thống nhất
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:10001/.well-known/agent.json"]
+
+  telltime_agent_svc:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: agents.tell_time_agent --host 0.0.0.0 --port 10002
+    environment:
+      - AGENT_PUBLIC_HOSTNAME=telltime_agent_svc
+    ports:
+      - "10002:10002"
+    volumes:
+      - .:/app
+    networks: # Thêm vào network chung
+      - milvus_compose_network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:10002/.well-known/agent.json"]
+
+  event_introduction_agent_svc:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: agents.event_introduction_agent --host 0.0.0.0 --port 10003
+
+    ports:
+      - "10003:10003"
+    volumes:
+      - .:/app
+    networks: # Thêm vào network chung
+      - milvus_compose_network
+    environment: # <--- THÊM VÀO ĐÂY
+      - AGENT_PUBLIC_HOSTNAME=event_introduction_agent_svc
+      - MILVUS_HOST=milvus-standalone
+      - MILVUS_PORT=19530
+    depends_on:
+      milvus-standalone:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:10003/.well-known/agent.json"]
+
+  host_agent_svc:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: agents.host_agent.entry --host 0.0.0.0 --port 10000 --registry utilities/agent_registry.docker.json
+    environment: # <--- THÊM VÀO ĐÂY
+      - AGENT_PUBLIC_HOSTNAME=host_agent_svc
+    ports:
+      - "10000:10000"
+    volumes:
+      - .:/app
+    depends_on:
+      telltime_agent_svc: # Giả sử telltime_agent_svc cũng có healthcheck tương tự
+        condition: service_healthy
+      greeting_agent_svc:
+        condition: service_healthy
+      event_introduction_agent_svc:
+        condition: service_healthy
+      # Nếu host_agent_svc cần Milvus, bạn có thể thêm:
+      # milvus-standalone:
+      #   condition: service_healthy
+    networks: # Thêm vào network chung
+      - milvus_compose_network
+
+  # ---- Milvus Stack Services ----
+  etcd:
+    container_name: milvus-etcd
+    image: quay.io/coreos/etcd:v3.5.5
+    environment:
+      - ETCD_AUTO_COMPACTION_MODE=revision
+      - ETCD_AUTO_COMPACTION_RETENTION=1000
+      - ETCD_QUOTA_BACKEND_BYTES=4294967296
+      - ETCD_SNAPSHOT_COUNT=50000
+    volumes:
+      - ${DOCKER_VOLUME_DIRECTORY:-./volumes}/etcd:/etcd # Đảm bảo đường dẫn này đúng
+    command: etcd -advertise-client-urls=http://127.0.0.1:2379 -listen-client-urls http://0.0.0.0:2379 --data-dir /etcd
+    healthcheck:
+      test: ["CMD", "etcdctl", "endpoint", "health"]
+      interval: 30s
+      timeout: 20s
+      retries: 3
+    networks:
+      - milvus_compose_network
+
+  minio:
+    container_name: milvus-minio
+    image: minio/minio:RELEASE.2023-03-20T20-16-18Z
+    environment:
+      MINIO_ACCESS_KEY: minioadmin
+      MINIO_SECRET_KEY: minioadmin
+    ports:
+      - "9001:9001"
+      - "9000:9000"
+    volumes:
+      - ${DOCKER_VOLUME_DIRECTORY:-./volumes}/minio:/minio_data # Đảm bảo đường dẫn này đúng
+    command: minio server /minio_data --console-address ":9001"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 30s
+      timeout: 20s
+      retries: 3
+    networks:
+      - milvus_compose_network
+
+  milvus-standalone:
+    image: milvusdb/milvus:v2.4.5
+    container_name: milvus-standalone
+    command: ["milvus", "run", "standalone"]
+    environment:
+      ETCD_ENDPOINTS: etcd:2379
+      MINIO_ADDRESS: minio:9000
+    volumes:
+      - ${DOCKER_VOLUME_DIRECTORY:-./volumes}/milvus:/var/lib/milvus # Đảm bảo đường dẫn này đúng
+    ports:
+      - "19530:19530"
+      - "9091:9091"
+    depends_on:
+      etcd:
+        condition: service_healthy
+      minio:
+        condition: service_healthy
+    networks:
+      - milvus_compose_network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9091/healthz"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+
+  attu:
+    image: zilliz/attu:v2.5
+    container_name: attu
+    ports:
+      - "8000:3000"
+    environment:
+      MILVUS_URL: milvus-standalone:19530
+    depends_on:
+      - milvus-standalone
+    networks:
+      - milvus_compose_network
+
+networks:
+  milvus_compose_network: # Giữ nguyên tên network này
+    driver: bridge
+    name: milvus_global_network
+# Các named volumes không cần thiết nếu bạn mount trực tiếp từ host như trên
+# volumes:
+#   etcd_data:
+#   minio_data:
+#   milvus_data:
