@@ -19,7 +19,7 @@ from server.server import A2AServer
 from models.agent import AgentCard, AgentCapabilities, AgentSkill
 from starlette.middleware import Middleware
 from middleware.auth import AuthMiddleware
-
+from database.database import Database  # Custom database connection manager
 # Orchestrator implementation and its task manager
 from agents.host_agent.orchestrator import (
     OrchestratorAgent,

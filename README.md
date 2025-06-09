@@ -85,22 +85,25 @@ version_3_multi_agent/
 
 ## 🎬 Demo Walkthrough
 
+
+**Start the Event introduction agent**
+```bash
+python -m agents.event_introduction_agent --host localhost --port 10003
+```
+
 **Start the TellTimeAgent**
 ```bash
-python -m agents.tell_time_agent \
-  --host localhost --port 10002
+python -m agents.tell_time_agent --host localhost --port 10002
 ```
 
 **Start the GreetingAgent**
 ```bash
-python -m agents.greeting_agent \
-  --host localhost --port 10001
+python -m agents.greeting_agent --host localhost --port 10001
 ```
 
 **Start the Orchestrator (Host) Agent**
 ```bash
-python -m agents.host_agent.entry \
-  --host localhost --port 10000
+python -m agents.host_agent.entry --host localhost --port 10000
 ```
 
 **Launch the CLI (cmd.py)**
