@@ -76,21 +76,6 @@ def main(host, port):
         skills=[skill]                                      # List of skills it supports
     )
 
-    # agent_card = AgentCard(
-    #     name="GreetingAgent",                              # Agent identifier
-    #     description="Agent that greets you based on the current time",
-    #     url=f"http://{public_hostname}:{port}/",                      # Base URL for discovery
-    #     version="1.0.0",                                   # Semantic version
-    #     defaultInputModes=["text"],                        # Accepts plain text
-    #     defaultOutputModes=["text"],                       # Produces plain text
-    #     capabilities=capabilities,                         # Streaming disabled
-    #     skills=[skill]                                     # List of skills
-    # )
-
-    # Start the A2A server with:
-    # - the given host/port
-    # - this agent’s metadata
-    # - a task manager that runs the TellTimeAgent
     server = A2AServer(
         host=host,
         port=port,

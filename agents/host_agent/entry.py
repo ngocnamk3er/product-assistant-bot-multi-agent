@@ -6,28 +6,62 @@
 # Uses the shared registry file to discover all child agents,
 # then delegates routing to the OrchestratorAgent via A2A JSON-RPC.
 # =============================================================================
-
+import asyncpg                              # Async PostgreSQL driver for database interactions
 import asyncio                              # Built-in for running async coroutines
 import logging                              # Standard Python logging module
 import click                                # Library for building CLI interfaces
-
+import os                                  # For reading environment variables
 # Utility for discovering remote A2A agents from a local registry
 from utilities.discovery import DiscoveryClient
 # Shared A2A server implementation (Starlette + JSON-RPC)
 from server.server import A2AServer
 # Pydantic models for defining agent metadata (AgentCard, etc.)
 from models.agent import AgentCard, AgentCapabilities, AgentSkill
+from starlette.middleware import Middleware
+from middleware.auth import AuthMiddleware
+
 # Orchestrator implementation and its task manager
 from agents.host_agent.orchestrator import (
     OrchestratorAgent,
     OrchestratorTaskManager
 )
+from functools import lru_cache
+
+@lru_cache()
+def get_settings():
+    return {
+        "database_url": os.getenv("DATABASE_URL"),
+        "jwt_secret_key": os.getenv("JWT_SECRET_KEY"),
+        "jwt_algorithm": os.getenv("JWT_ALGORITHM"),
+        "access_token_expire_minutes": int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES")),
+    }
+
+SETTINGS = get_settings()
+
+class Database:
+    def __init__(self, db_url):
+        self._db_url = db_url
+        self.pool = None
+
+    async def connect(self):
+        if not self.pool:
+            self.pool = await asyncpg.create_pool(dsn=self._db_url, min_size=1, max_size=10)
+            print("Database connection pool created.")
+
+    async def disconnect(self):
+        if self.pool:
+            await self.pool.close()
+            print("Database connection pool closed.")
+
+    async def fetch_one(self, query, *params):
+        async with self.pool.acquire() as connection:
+            return await connection.fetchrow(query, *params)
+        
+db = Database(SETTINGS["database_url"])
 
 # Configure root logger to show INFO-level messages
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
-
-
 @click.command()
 @click.option(
     "--host", default="localhost",
@@ -98,13 +132,21 @@ def main(host: str, port: int, registry: str):
     orchestrator = OrchestratorAgent(agent_cards=agent_cards)
     task_manager = OrchestratorTaskManager(agent=orchestrator)
 
+
     # 4) Create and start the A2A server
+    
+    middleware = [
+        Middleware(AuthMiddleware, db=db, settings=SETTINGS)
+    ]
     server = A2AServer(
         host=host,
         port=port,
         agent_card=orchestrator_card,
         task_manager=task_manager
     )
+    server.app.add_middleware(*middleware)
+    server.app.on_startup.append(db.connect)
+    server.app.on_shutdown.append(db.disconnect)
     server.start()
 
 
