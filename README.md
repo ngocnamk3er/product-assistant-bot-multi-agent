@@ -85,6 +85,11 @@ version_3_multi_agent/
 
 ## 🎬 Demo Walkthrough
 
+**Start the Server backend**
+```bash
+python -m backend.server --host localhost --port 2000
+```
+
 
 **Start the Event introduction agent**
 ```bash
