@@ -44,81 +44,37 @@ SOURCE_FIELD_NAME = "source_document"  # Tùy chọn
 # -----------------------------------------------------------------------------
 SAMPLE_DATA = [
     {
-        "id": "event101",
-        "text": "Sự kiện ra mắt dòng điện thoại thông minh Nova Z10 sẽ được tổ chức vào ngày 20 tháng 9 tại TP. Hồ Chí Minh. Nova Z10 nổi bật với camera AI 200MP và thiết kế viền mỏng.",
-        "source": "Thông cáo báo chí từ Nova Mobile",
+        "id": "event001",  # ID duy nhất cho mỗi document
+        "text": "The Annual Summer Music Festival will take place from July 15th to July 17th. Headliners include The Cosmic Keys and Solar Flare.",
+        "source": "Official Festival Announcement 2024",
     },
     {
-        "id": "event102",
-        "text": "Đặt trước Nova Z10 từ ngày 21 đến 30 tháng 9 để nhận ngay ưu đãi giảm giá 15% và tai nghe không dây Nova Buds Pro trị giá 2 triệu đồng.",
-        "source": "Trang chủ Nova Mobile - Chương trình đặt trước",
+        "id": "event002",
+        "text": "Early bird tickets for the Summer Music Festival are available until June 30th. VIP passes include backstage access and a dedicated lounge.",
+        "source": "Festival Ticketing Page",
     },
     {
-        "id": "event103",
-        "text": "Hãng điện thoại VinaTech công bố xây dựng nhà máy sản xuất smartphone thế hệ mới tại Bắc Ninh, dự kiến đi vào hoạt động đầu năm 2026.",
-        "source": "Báo Công Nghệ Việt - Tin tức sản xuất",
+        "id": "product001",
+        "text": "Our new Quantum Laptop X features a 16-core processor, 32GB RAM, and a self-healing Nanonite screen. Pre-orders open next week.",
+        "source": "Product Launch Press Release - Quantum Laptop X",
     },
     {
-        "id": "event104",
-        "text": "Chiến dịch 'Flash Sale 48h' giảm giá tới 40% cho các dòng điện thoại Galaxy Edge và Galaxy Lite, diễn ra từ 10 đến 12 tháng 10.",
-        "source": "Trang khuyến mãi chính thức của Galaxy Việt Nam",
+        "id": "product002",
+        "text": "The Quantum Laptop X battery lasts up to 20 hours on a single charge. It supports fast charging, reaching 80% in just 45 minutes.",
+        "source": "Quantum Laptop X - Technical Specifications",
     },
     {
-        "id": "event105",
-        "text": "TechVision hợp tác với AI Quantum Labs để phát triển chip xử lý mới dành cho smartphone, tăng hiệu suất gấp 3 lần so với thế hệ trước.",
-        "source": "Thông cáo hợp tác công nghệ TechVision 2024",
+        "id": "event003",
+        "text": "The Tech Innovators Conference is scheduled for October 5th-7th. Keynote speakers include Dr. Aris Thorne and CEO Jian Li.",
+        "source": "Tech Conference Website 2024",
     },
     {
-        "id": "event106",
-        "text": "Cuộc thi ảnh 'Shot on Pixel Z' dành riêng cho người dùng điện thoại Pixel Z vừa được khởi động, với tổng giải thưởng hơn 100 triệu đồng.",
-        "source": "Website Pixel Việt Nam - Thông báo cuộc thi",
-    },
-    {
-        "id": "event107",
-        "text": "Điện thoại Phoenix S9 đạt chứng nhận kháng nước IP69 và được trang bị kính chống vỡ Corning Z-Shield mới nhất.",
-        "source": "Bản tin sản phẩm Phoenix S9 - Tạp chí Công nghệ",
-    },
-    {
-        "id": "event108",
-        "text": "Từ ngày 1 đến 7 tháng 11, khi mua bất kỳ mẫu điện thoại nào của thương hiệu Xphone tại cửa hàng chính hãng, khách hàng sẽ được giảm giá 1 triệu đồng và nhận thêm sạc nhanh 65W miễn phí.",
-        "source": "Fanpage Xphone Việt Nam",
-    },
-    {
-        "id": "event109",
-        "text": "Hội nghị Nhà phát triển Ứng dụng di động sẽ có phiên chuyên đề giới thiệu về các tính năng độc quyền trên điện thoại Galaxy Note V.",
-        "source": "Lịch trình Hội nghị Mobile DevCon 2024",
-    },
-    {
-        "id": "event110",
-        "text": "Cửa hàng Thế Giới Số khai trương chi nhánh mới tại Đà Nẵng, mở bán 500 chiếc điện thoại OneMax 12 với giá ưu đãi chỉ 3.990.000đ.",
-        "source": "Thông báo khai trương từ Thế Giới Số",
-    },
-    {
-        "id": "event111",
-        "text": "SkyPhone ra mắt công nghệ 'Pin kép phân tách nhiệt' giúp tăng tuổi thọ pin thêm 35% so với công nghệ hiện tại.",
-        "source": "Bản tin Công nghệ SkyPhone 2024",
-    },
-    {
-        "id": "event112",
-        "text": "Sự kiện 'Trải nghiệm trước - Mua sau' dành riêng cho dòng smartphone Aven X Series tổ chức tại Hà Nội và TP. Hồ Chí Minh cuối tuần này.",
-        "source": "Thông báo sự kiện từ Aven Việt Nam",
-    },
-    {
-        "id": "event113",
-        "text": "Mẫu điện thoại Vega 8 Pro giành giải 'Thiết kế đột phá' tại Triển lãm Công nghệ Châu Á 2024 nhờ mặt lưng biến màu theo ánh sáng.",
-        "source": "Báo cáo giải thưởng TechAsia 2024",
-    },
-    {
-        "id": "event114",
-        "text": "Vivo tổ chức livestream ra mắt dòng sản phẩm mới Vivo Z90 kèm mini game trúng điện thoại và voucher trị giá 500.000đ.",
-        "source": "Fanpage chính thức Vivo Việt Nam",
-    },
-    {
-        "id": "event115",
-        "text": "FPT Shop công bố chương trình đổi cũ lấy mới: thu mua điện thoại cũ lên tới 3 triệu đồng khi nâng cấp lên mẫu Galaxy Z Fold mới nhất.",
-        "source": "Website FPT Shop - Trang chương trình thu cũ đổi mới",
+        "id": "event004",
+        "text": "Call for papers for the Tech Innovators Conference is now open. Submit your research on AI, blockchain, or quantum computing by August 15th.",
+        "source": "Tech Conference - Call for Papers",
     },
 ]
+
 
 # -----------------------------------------------------------------------------
 # 🛠️ Helper Function for Embedding (MATCH THIS WITH YOUR AGENT'S)
