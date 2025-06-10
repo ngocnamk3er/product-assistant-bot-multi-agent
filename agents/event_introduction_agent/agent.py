@@ -62,7 +62,7 @@ TEXT_CONTENT_FIELD_NAME = (
     "text_content"  # <<< THAY THẾ BẰNG TÊN TRƯỜNG CHỨA NỘI DUNG TEXT
 )
 SOURCE_FIELD_NAME = "source_document"  # <<< TÙY CHỌN: TÊN TRƯỜNG CHỨA NGUỒN GỐC
-TOP_K_RESULTS = 3
+TOP_K_RESULTS = 5
 
 # -----------------------------------------------------------------------------
 # 🛠️ Helper Functions for Milvus Tool
@@ -227,8 +227,10 @@ class EventIntroductionAgent:
             description="Phản hồi thông tin sự kiện bằng cách tìm kiếm trong cơ sở tri thức",
             instruction=(
                 "Bạn là một trợ lý AI hữu ích, chuyên cung cấp thông tin về sự kiện. "
-                "Khi người dùng hỏi một câu hỏi cụ thể về sự kiện, sản phẩm, hoặc bất kỳ chi tiết nào có thể có trong cơ sở tri thức, "
-                "hãy ưu tiên sử dụng công cụ 'search_milvus_knowledge_base' để tìm kiếm thông tin liên quan trước."
+                "Khi người dùng hỏi về sự kiện, sản phẩm, hoặc bất kỳ chi tiết nào có thể có trong cơ sở tri thức, "
+                "**HÃY LUÔN LUÔN** sử dụng công cụ 'search_milvus_knowledge_base' để tìm kiếm thông tin liên quan **TRƯỚC TIÊN**."
+                "**Đây là bước bắt buộc đầu tiên của bạn** khi nhận được câu hỏi thuộc phạm vi cơ sở tri thức."
+                "Chỉ khi kết quả tìm kiếm không đủ để trả lời hoặc cần làm rõ thêm, bạn mới tương tác lại với người dùng."
             ),
             tools=[
                 FunctionTool(search_milvus_knowledge_base),  # Add the new Milvus tool
