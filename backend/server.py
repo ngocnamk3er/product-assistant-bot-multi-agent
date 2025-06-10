@@ -51,7 +51,7 @@ def verify_password(plain_password, hashed_password):
 
 # --- Lớp Server chính ---
 class Server:
-    def __init__(self, host="0.0.0.0", port=8000):
+    def __init__(self, host="0.0.0.0", port=2000):
         self.host = host
         self.port = port
         

@@ -139,22 +139,15 @@ class GreetingAgent:
 
         # --- System instruction for the LLM ---
         system_instr = (
-            "You have only one task: to greet and communicate with users."
+            "Bạn chỉ có 1 nhiệm vụ duy nhất là chào hỏi người dùng"
         )
-
-        # Wrap our Python functions into ADK FunctionTool objects
-        tools = [
-            FunctionTool(list_agents),   # auto-uses function name and signature
-            FunctionTool(call_agent),
-        ]
 
         # Finally, create and return the LlmAgent with everything wired up
         return LlmAgent(
             model="gemini-1.5-flash-latest",               # which Gemini model
             name="greeting_orchestrator",                  # internal name
-            description="Orchestrates time fetching and generates poetic greetings.",
+            description="Greetings.",
             instruction=system_instr,                      # system prompt
-            # tools=tools,                                   # available tools
         )
 
 

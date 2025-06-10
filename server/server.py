@@ -54,7 +54,15 @@ def json_serializer(obj):
 # 🚀 A2AServer Class: The Core Server Logic
 # -----------------------------------------------------------------------------
 class A2AServer:
-    def __init__(self, host="0.0.0.0", port=5000, agent_card: AgentCard = None, task_manager: task_manager = None):
+    def __init__(self, 
+                 host="0.0.0.0", 
+                 port=5000, 
+                 agent_card: AgentCard = None, 
+                 task_manager: task_manager = None,
+                 middleware: list = None,
+                 on_startup: list = None, 
+                 on_shutdown: list = None
+                 ):
         """
         🔧 Constructor for our A2AServer
 
@@ -70,7 +78,11 @@ class A2AServer:
         self.task_manager = task_manager
 
         # 🌐 Starlette app initialization
-        self.app = Starlette()
+        self.app = Starlette(
+            middleware=middleware,
+            on_startup=on_startup,
+            on_shutdown=on_shutdown
+        )
 
         # 📥 Register a route to handle task requests (JSON-RPC POST)
         self.app.add_route("/", self._handle_request, methods=["POST"])

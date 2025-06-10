@@ -134,19 +134,25 @@ def main(host: str, port: int, registry: str):
 
 
     # 4) Create and start the A2A server
-    
-    middleware = [
+    middleware_list = [
         Middleware(AuthMiddleware, db=db, settings=SETTINGS)
     ]
+    startup_handlers = [
+        db.connect
+    ]
+    shutdown_handlers = [
+        db.disconnect
+    ]
+    
     server = A2AServer(
         host=host,
         port=port,
         agent_card=orchestrator_card,
-        task_manager=task_manager
+        task_manager=task_manager,
+        middleware=middleware_list,       
+        on_startup=startup_handlers,   
+        on_shutdown=shutdown_handlers   
     )
-    server.app.add_middleware(*middleware)
-    server.app.on_startup.append(db.connect)
-    server.app.on_shutdown.append(db.disconnect)
     server.start()
 
 

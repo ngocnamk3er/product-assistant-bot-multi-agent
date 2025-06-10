@@ -45,36 +45,35 @@ SOURCE_FIELD_NAME = "source_document"  # Tùy chọn
 SAMPLE_DATA = [
     {
         "id": "event001",  # ID duy nhất cho mỗi document
-        "text": "The Annual Summer Music Festival will take place from July 15th to July 17th. Headliners include The Cosmic Keys and Solar Flare.",
-        "source": "Official Festival Announcement 2024",
+        "text": "Lễ hội Âm nhạc Mùa hè Thường niên sẽ diễn ra từ ngày 15 đến 17 tháng 7. Các nghệ sĩ chính bao gồm The Cosmic Keys và Solar Flare.",
+        "source": "Thông báo chính thức Lễ hội 2024",
     },
     {
         "id": "event002",
-        "text": "Early bird tickets for the Summer Music Festival are available until June 30th. VIP passes include backstage access and a dedicated lounge.",
-        "source": "Festival Ticketing Page",
+        "text": "Vé ưu đãi (early bird) cho Lễ hội Âm nhạc Mùa hè được bán đến hết ngày 30 tháng 6. Vé VIP bao gồm quyền vào hậu trường và một phòng chờ riêng.",
+        "source": "Trang bán vé Lễ hội",
     },
     {
         "id": "product001",
-        "text": "Our new Quantum Laptop X features a 16-core processor, 32GB RAM, and a self-healing Nanonite screen. Pre-orders open next week.",
-        "source": "Product Launch Press Release - Quantum Laptop X",
+        "text": "Máy tính xách tay Quantum Laptop X mới của chúng tôi có bộ xử lý 16 lõi, 32GB RAM và màn hình Nanonite tự phục hồi. Đơn đặt hàng trước sẽ mở vào tuần tới.",
+        "source": "Thông cáo báo chí ra mắt sản phẩm - Quantum Laptop X",
     },
     {
         "id": "product002",
-        "text": "The Quantum Laptop X battery lasts up to 20 hours on a single charge. It supports fast charging, reaching 80% in just 45 minutes.",
-        "source": "Quantum Laptop X - Technical Specifications",
+        "text": "Pin của Quantum Laptop X có thể kéo dài tới 20 giờ cho một lần sạc. Máy hỗ trợ sạc nhanh, đạt 80% pin chỉ trong 45 phút.",
+        "source": "Quantum Laptop X - Thông số kỹ thuật",
     },
     {
         "id": "event003",
-        "text": "The Tech Innovators Conference is scheduled for October 5th-7th. Keynote speakers include Dr. Aris Thorne and CEO Jian Li.",
-        "source": "Tech Conference Website 2024",
+        "text": "Hội nghị Các nhà Đổi mới Công nghệ được lên lịch vào ngày 5-7 tháng 10. Các diễn giả chính bao gồm Tiến sĩ Aris Thorne và CEO Jian Li.",
+        "source": "Trang web Hội nghị Công nghệ 2024",
     },
     {
         "id": "event004",
-        "text": "Call for papers for the Tech Innovators Conference is now open. Submit your research on AI, blockchain, or quantum computing by August 15th.",
-        "source": "Tech Conference - Call for Papers",
+        "text": "Kêu gọi gửi bài tham luận cho Hội nghị Các nhà Đổi mới Công nghệ hiện đã mở. Gửi nghiên cứu của bạn về AI, blockchain, hoặc máy tính lượng tử trước ngày 15 tháng 8.",
+        "source": "Hội nghị Công nghệ - Kêu gọi tham luận",
     },
 ]
-
 
 # -----------------------------------------------------------------------------
 # 🛠️ Helper Function for Embedding (MATCH THIS WITH YOUR AGENT'S)

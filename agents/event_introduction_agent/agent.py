@@ -224,20 +224,13 @@ class EventIntroductionAgent:
         return LlmAgent(
             model="gemini-1.5-flash-latest",
             name="event_introduction_and_kb_agent",
-            description="Responds to event information, searches a knowledge base, and can announce sales.",
+            description="Phản hồi thông tin sự kiện bằng cách tìm kiếm trong cơ sở tri thức",
             instruction=(
-                "You are a helpful AI assistant for event information. "
-                "If the user asks a specific question about an event, product, or any detail that might be in a knowledge base, "
-                "first use the 'search_milvus_knowledge_base' tool to find relevant information. "
-                "Use the information returned by the tool to answer the user's question. "
-                "If the tool returns 'No relevant information found...' or an error, inform the user you couldn't find specific details. "
-                "If the user asks a general greeting or a question not suitable for a KB search, "
-                "you can reply that there is a big sale coming up at the end of the year. "
-                "Do not make up information if it's not found by the tool."
+                "Bạn là một trợ lý AI hữu ích, chuyên cung cấp thông tin về sự kiện. "
+                "Khi người dùng hỏi một câu hỏi cụ thể về sự kiện, sản phẩm, hoặc bất kỳ chi tiết nào có thể có trong cơ sở tri thức, "
+                "hãy ưu tiên sử dụng công cụ 'search_milvus_knowledge_base' để tìm kiếm thông tin liên quan trước."
             ),
             tools=[
-                FunctionTool(calculate_number_of_tokens),
-                FunctionTool(calculate_length_of_input),
                 FunctionTool(search_milvus_knowledge_base),  # Add the new Milvus tool
             ],
         )
@@ -267,8 +260,6 @@ class EventIntroductionAgent:
 
         # 6) Otherwise, join all text parts of the final event and return
         return "\n".join(p.text for p in events[-1].content.parts if p.text)
-
-
 
     async def stream(self, query: str, session_id: str):
         # This stream method is still the simple time-telling one,
