@@ -87,7 +87,7 @@ def get_text_embedding(text: str, task_type="RETRIEVAL_DOCUMENT") -> list[float]
             contents=text,
             config=EmbedContentConfig(
                 task_type="RETRIEVAL_DOCUMENT",  # Optional
-                output_dimensionality=3072,  # Optional
+                output_dimensionality=768,  # Optional
                 title="Driver's License",  # Optional
             ),
         )

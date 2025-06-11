@@ -52,17 +52,19 @@ MILVUS_PORT = os.getenv("MILVUS_PORT", "19530")
 # MILVUS_USER = os.getenv("MILVUS_USER") # Uncomment if your Milvus needs auth
 # MILVUS_PASSWORD = os.getenv("MILVUS_PASSWORD") # Uncomment if your Milvus needs auth
 MILVUS_COLLECTION_NAME = (
-    "event_knowledge_base"  # <<< THAY THẾ BẰNG TÊN COLLECTION CỦA BẠN
+    "phone_knowledge_base"  # <<< THAY THẾ BẰNG TÊN COLLECTION CỦA BẠN
 )
 EMBEDDING_MODEL_NAME = "embedding-001"  # Or "models/text-embedding-004" etc.
 VECTOR_FIELD_NAME = (
     "embedding"  # <<< THAY THẾ BẰNG TÊN TRƯỜNG VECTOR TRONG COLLECTION CỦA BẠN
 )
-TEXT_CONTENT_FIELD_NAME = (
-    "text_content"  # <<< THAY THẾ BẰNG TÊN TRƯỜNG CHỨA NỘI DUNG TEXT
-)
-SOURCE_FIELD_NAME = "source_document"  # <<< TÙY CHỌN: TÊN TRƯỜNG CHỨA NGUỒN GỐC
-TOP_K_RESULTS = 3
+TEXT_CONTENT_FIELD_NAMES = [
+    "name",
+    "formatted_specs",
+    "price"
+]
+SOURCE_FIELD_NAME = "url"  # <<< TÙY CHỌN: TÊN TRƯỜNG CHỨA NGUỒN GỐC
+TOP_K_RESULTS = 5
 
 # -----------------------------------------------------------------------------
 # 🛠️ Helper Functions for Milvus Tool
@@ -77,8 +79,7 @@ def get_text_embedding(text: str, task_type="RETRIEVAL_QUERY") -> list[float]:
             contents=text,
             config=EmbedContentConfig(
                 task_type="RETRIEVAL_DOCUMENT",  # Optional
-                output_dimensionality=3072,  # Optional
-                title="Driver's License",  # Optional
+                output_dimensionality=768,  # Optional
             ),
         )
         # print(f"Generated embedding for text: {result.embeddings[0].values}")  # Debugging
@@ -128,13 +129,13 @@ def search_milvus_knowledge_base(search_query: str) -> str:
 
         # 4. Perform search
         search_params = {
-            "metric_type": "L2",  # Or "IP" (Inner Product) depending on your data/preference
+            "metric_type": "COSINE",  # Or "IP" (Inner Product) depending on your data/preference
             "params": {
                 "nprobe": 10
             },  # Example search param, adjust based on your index type
         }
 
-        output_fields = [TEXT_CONTENT_FIELD_NAME]
+        output_fields = TEXT_CONTENT_FIELD_NAMES
         if SOURCE_FIELD_NAME:  # Only include source if it's configured
             # Ensure SOURCE_FIELD_NAME is part of your collection schema if you use it
             if SOURCE_FIELD_NAME in [field.name for field in collection.schema.fields]:
@@ -166,9 +167,18 @@ def search_milvus_knowledge_base(search_query: str) -> str:
 
         formatted_results = "Found the following information from the knowledge base:\n"
         for i, hit in enumerate(results[0]):
-            content = hit.entity.get(TEXT_CONTENT_FIELD_NAME, "N/A")
-            formatted_results += f"\nResult {i+1} (Score: {hit.distance:.4f}):\n"
-            formatted_results += f"Content: {content}\n"
+             formatted_results += f"\nResult {i+1} (Score: {hit.distance:.4f}):\n"
+
+        # SỬA Ở ĐÂY: Lấy từng trường trong TEXT_CONTENT_FIELD_NAMES
+        content_parts = []
+        for field_name in TEXT_CONTENT_FIELD_NAMES:
+            value = hit.entity.get(field_name, "N/A")
+            # Tùy chỉnh cách hiển thị tên trường nếu muốn (ví dụ: viết hoa chữ cái đầu)
+            display_field_name = field_name.replace("_", " ").capitalize()
+            content_parts.append(f"{display_field_name}: {value}")
+            content_str = "\n".join(content_parts)
+
+            formatted_results += f"Content:\n{content_str}\n"
             if SOURCE_FIELD_NAME and SOURCE_FIELD_NAME in output_fields:
                 source = hit.entity.get(SOURCE_FIELD_NAME, "N/A")
                 formatted_results += f"Source: {source}\n"
@@ -194,7 +204,7 @@ def search_milvus_knowledge_base(search_query: str) -> str:
 # -----------------------------------------------------------------------------
 
 
-class EventIntroductionAgent:
+class PhoneQuestionAnsweringAgent:
     SUPPORTED_CONTENT_TYPES = ["text", "text/plain"]
 
     def __init__(self):
@@ -222,16 +232,18 @@ class EventIntroductionAgent:
         milvus_kb_tool = FunctionTool(search_milvus_knowledge_base)
 
         return LlmAgent(
-            model="gemini-1.5-flash-latest",
-            name="event_introduction_and_kb_agent",
-            description="Phản hồi thông tin sự kiện bằng cách tìm kiếm trong cơ sở tri thức",
+            model="gemini-2.5-flash-preview-05-20",
+            name="phone_policy_question_answer_agent",
+            description="Trợ lý AI chuyên cung cấp thông tin  điện thoại trong cơ sỡ diệu liệu của công ty",
             instruction=(
-                "Bạn là một trợ lý AI hữu ích, chuyên cung cấp thông tin về sự kiện. "
-                "Khi người dùng hỏi một câu hỏi cụ thể về sự kiện, sản phẩm, hoặc bất kỳ chi tiết nào có thể có trong cơ sở tri thức, "
-                "hãy ưu tiên sử dụng công cụ 'search_milvus_knowledge_base' để tìm kiếm thông tin liên quan trước."
+                "Bạn là trợ lý AI chuyên về trả lời các câu hỏi liên quan về điện thoại di động, thực hiện theo các bước sau "
+                "Bước 1: không lấy hết câu hỏi người dùng mà phải tách từ khóa từ câu hỏi của người dùng để làm từ truy vấn"
+                "Bước 2: Sử dụng công cụ 'search_milvus_knowledge_base' để tìm kiếm thông tin trong cơ sở dữ liệu."
+                "Bước 3: Dựa trên kết quả tìm kiếm, trả lời câu hỏi của người dùng một cách chính xác và đầy đủ."
+                "Nếu công cụ tìm kiếm không trả về thông tin liên quan, hãy thông báo cho người dùng rằng bạn không tìm thấy thông tin trong cơ sở dữ liệu."
             ),
             tools=[
-                FunctionTool(search_milvus_knowledge_base),  # Add the new Milvus tool
+                milvus_kb_tool,  # Add the new Milvus tool
             ],
         )
 
@@ -272,22 +284,11 @@ class EventIntroductionAgent:
 
 # --- Example Usage (for testing locally) ---
 async def main():
-    agent = EventIntroductionAgent()
+    agent = PhoneQuestionAnsweringAgent()
     session_id = "test_session_milvus_001"
 
     print("Agent initialized. Type 'quit' to exit.")
 
-    # Example: Pre-populate Milvus (you'd do this separately in a real setup)
-    # Ensure your Milvus server is running and the collection `event_knowledge_base`
-    # is created with appropriate fields (e.g., id (primary, auto-id), embedding (float_vector, dim=768),
-    # text_content (varchar), source_document (varchar)).
-    # For this example, we'll assume it's populated.
-
-    # Test Milvus search directly (optional)
-    # print("\n--- Testing Milvus search function directly ---")
-    # test_search_result = search_milvus_knowledge_base("Tell me about the summer festival")
-    # print(test_search_result)
-    # print("---------------------------------------------\n")
 
     while True:
         user_query = input("You: ")
@@ -304,11 +305,4 @@ async def main():
 
 if __name__ == "__main__":
     import asyncio
-
-    # Test a direct call to the Milvus search function for debugging
-    # print("Directly testing Milvus search (ensure Milvus is running and collection exists):")
-    # test_query = "What special offers are available for VIP members at the concert?"
-    # direct_search_results = search_milvus_knowledge_base(test_query)
-    # print(f"Direct search results for '{test_query}':\n{direct_search_results}\n")
-
     asyncio.run(main())

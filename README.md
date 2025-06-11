@@ -90,6 +90,13 @@ version_3_multi_agent/
 python -m backend.server --host localhost --port 2000
 ```
 
+**Start the Phone QA agent**
+```bash
+python -m agents.phone_qa_agent --host localhost --port 10005
+```
+
+
+
 **Start the Policy QA agent**
 ```bash
 python -m agents.policy_qa_agent --host localhost --port 10004

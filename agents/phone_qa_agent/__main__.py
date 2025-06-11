@@ -23,8 +23,8 @@ from server.server import A2AServer
 from models.agent import AgentCard, AgentCapabilities, AgentSkill
 
 # Task manager and agent logic
-from agents.event_introduction_agent.task_manager import EventIntroAgentTaskManager
-from agents.event_introduction_agent.agent import EventIntroductionAgent
+from agents.phone_qa_agent.task_manager import PhoneQuestionAnsweringTaskManager
+from agents.phone_qa_agent.agent import PhoneQuestionAnsweringAgent
 
 # CLI and logging support
 import click           # For creating a clean command-line interface
@@ -45,7 +45,7 @@ logger = logging.getLogger(__name__)
 
 @click.command()
 @click.option("--host", default="localhost", help="Host to bind the server to")
-@click.option("--port", default=10003, help="Port number for the server")
+@click.option("--port", default=10004, help="Port number for the server")
 def main(host, port):
     """
     This function sets up everything needed to start the agent server.
@@ -57,21 +57,20 @@ def main(host, port):
 
     # Define the skill this agent offers (used in directories and UIs)
     skill = AgentSkill(
-        id="introduce_event",                                 # Unique skill ID
-        name="Introduce event Agent",                          # Human-friendly name
-        description="Respond to information about upcoming events",    # What the skill does
-        tags=["time"],                                  # Optional tags for searching
-        examples=["What events are coming up?", "Upcoming events are ...."]  # Example queries
+        id="phone_question_answering_agent",                                 # Unique skill ID
+        name="Phone Question Answering Agent",                          # Human-friendly name
+        description="Trả lời người dùng về các sản phẩm điện thoại hiện có",    # What the skill does
+        examples=["Cho tôi thông tin về điện thoại Iphone 16 mới ra mắt?", "Iphone 16 mới có các tính năng...."]  # Example queries
     )
 
     # Create an agent card describing this agent’s identity and metadata
     agent_card = AgentCard(
-        name="EventIntroductionAgent",                               # Name of the agent
-        description="Respond to information about upcoming events.",  # Description
+        name="Phone Question Answering Agent",                               # Name of the agent
+        description="Trả lời người dùng về các sản phẩm điện thoại hiện có",  # Description
         url=f"http://{public_hostname}:{port}/",                       # The public URL where this agent lives
         version="1.0.0",                                    # Version number
-        defaultInputModes=EventIntroductionAgent.SUPPORTED_CONTENT_TYPES,  # Input types this agent supports
-        defaultOutputModes=EventIntroductionAgent.SUPPORTED_CONTENT_TYPES, # Output types it produces
+        defaultInputModes=PhoneQuestionAnsweringAgent.SUPPORTED_CONTENT_TYPES,  # Input types this agent supports
+        defaultOutputModes=PhoneQuestionAnsweringAgent.SUPPORTED_CONTENT_TYPES, # Output types it produces
         capabilities=capabilities,                          # Supported features (e.g., streaming)
         skills=[skill]                                      # List of skills it supports
     )
@@ -80,7 +79,7 @@ def main(host, port):
         host=host,
         port=port,
         agent_card=agent_card,
-        task_manager=EventIntroAgentTaskManager(agent=EventIntroductionAgent())
+        task_manager=PhoneQuestionAnsweringTaskManager(agent=PhoneQuestionAnsweringAgent())
     )
 
     # Start listening for tasks
