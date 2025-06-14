@@ -5,7 +5,7 @@ from datetime import timezone
 from functools import lru_cache
 
 import uvicorn
-import asyncpg
+# import asyncpg
 import jwt
 import bcrypt
 from starlette.applications import Starlette

@@ -58,9 +58,9 @@ EMBEDDING_MODEL_NAME = "embedding-001"  # Or "models/text-embedding-004" etc.
 VECTOR_FIELD_NAME = (
     "embedding"  # <<< THAY THẾ BẰNG TÊN TRƯỜNG VECTOR TRONG COLLECTION CỦA BẠN
 )
-TEXT_CONTENT_FIELD_NAME = (
+TEXT_CONTENT_FIELD_NAMES = [
     "text_content"  # <<< THAY THẾ BẰNG TÊN TRƯỜNG CHỨA NỘI DUNG TEXT
-)
+]
 SOURCE_FIELD_NAME = "source_document"  # <<< TÙY CHỌN: TÊN TRƯỜNG CHỨA NGUỒN GỐC
 TOP_K_RESULTS = 5
 
@@ -78,7 +78,6 @@ def get_text_embedding(text: str, task_type="RETRIEVAL_QUERY") -> list[float]:
             config=EmbedContentConfig(
                 task_type="RETRIEVAL_DOCUMENT",  # Optional
                 output_dimensionality=768,  # Optional
-                title="Driver's License",  # Optional
             ),
         )
         # print(f"Generated embedding for text: {result.embeddings[0].values}")  # Debugging
@@ -134,7 +133,7 @@ def search_milvus_knowledge_base(search_query: str) -> str:
             },  # Example search param, adjust based on your index type
         }
 
-        output_fields = [TEXT_CONTENT_FIELD_NAME]
+        output_fields = TEXT_CONTENT_FIELD_NAMES
         if SOURCE_FIELD_NAME:  # Only include source if it's configured
             # Ensure SOURCE_FIELD_NAME is part of your collection schema if you use it
             if SOURCE_FIELD_NAME in [field.name for field in collection.schema.fields]:
@@ -166,11 +165,20 @@ def search_milvus_knowledge_base(search_query: str) -> str:
 
         formatted_results = "Found the following information from the knowledge base:\n"
         for i, hit in enumerate(results[0]):
-            content = hit.entity.get(TEXT_CONTENT_FIELD_NAME, "N/A")
             formatted_results += f"\nResult {i+1} (Score: {hit.distance:.4f}):\n"
-            formatted_results += f"Content: {content}\n"
+
+        # SỬA Ở ĐÂY: Lấy từng trường trong TEXT_CONTENT_FIELD_NAMES
+        content_parts = []
+        for field_name in TEXT_CONTENT_FIELD_NAMES:
+            value = hit.entity.get(field_name)
+            # Tùy chỉnh cách hiển thị tên trường nếu muốn (ví dụ: viết hoa chữ cái đầu)
+            display_field_name = field_name.replace("_", " ").capitalize()
+            content_parts.append(f"{display_field_name}: {value}")
+            content_str = "\n".join(content_parts)
+
+            formatted_results += f"Content:\n{content_str}\n"
             if SOURCE_FIELD_NAME and SOURCE_FIELD_NAME in output_fields:
-                source = hit.entity.get(SOURCE_FIELD_NAME, "N/A")
+                source = hit.entity.get(SOURCE_FIELD_NAME)
                 formatted_results += f"Source: {source}\n"
 
         return formatted_results
@@ -187,6 +195,7 @@ def search_milvus_knowledge_base(search_query: str) -> str:
             print("Disconnected from Milvus.")
         except Exception as e:
             print(f"Error disconnecting from Milvus: {e}")
+
 
 
 # -----------------------------------------------------------------------------
@@ -230,7 +239,7 @@ class EventIntroductionAgent:
                 "Khi người dùng hỏi về sự kiện, sản phẩm, hoặc bất kỳ chi tiết nào có thể có trong cơ sở tri thức, "
                 "**HÃY LUÔN LUÔN** sử dụng công cụ 'search_milvus_knowledge_base' để tìm kiếm thông tin liên quan **TRƯỚC TIÊN**."
                 "**Đây là bước bắt buộc đầu tiên của bạn** khi nhận được câu hỏi thuộc phạm vi cơ sở tri thức."
-                "Chỉ khi kết quả tìm kiếm không đủ để trả lời hoặc cần làm rõ thêm, bạn mới tương tác lại với người dùng."
+                "Trả lời cho người dùng"
             ),
             tools=[
                 FunctionTool(search_milvus_knowledge_base),  # Add the new Milvus tool

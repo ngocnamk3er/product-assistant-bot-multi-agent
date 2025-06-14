@@ -92,7 +92,7 @@ python -m backend.server --host localhost --port 2000
 
 **Start the Phone QA agent**
 ```bash
-python -m agents.phone_qa_agent --host localhost --port 10005
+python -m agents.sale_support_agent --host localhost --port 10005
 ```
 
 
@@ -108,10 +108,6 @@ python -m agents.policy_qa_agent --host localhost --port 10004
 python -m agents.event_introduction_agent --host localhost --port 10003
 ```
 
-**Start the TellTimeAgent**
-```bash
-python -m agents.tell_time_agent --host localhost --port 10002
-```
 
 **Start the GreetingAgent**
 ```bash

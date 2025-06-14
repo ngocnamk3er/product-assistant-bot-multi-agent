@@ -21,7 +21,7 @@ import logging  # Standard Python module for logging debug/info messages
 from server.task_manager import InMemoryTaskManager
 
 # 🤖 Import the actual agent we're using (Gemini-powered EventIntroductionAgent)
-from agents.phone_qa_agent.agent import PhoneQuestionAnsweringAgent
+from agents.sale_support_agent.agent import SaleSupportAgent
 
 # 📦 Import data models used to structure and return tasks
 from models.request import SendTaskRequest, SendTaskResponse
@@ -40,7 +40,7 @@ logger = logging.getLogger(__name__)
 # EventIntroAgentTaskManager
 # -----------------------------------------------------------------------------
 
-class PhoneQuestionAnsweringTaskManager(InMemoryTaskManager):
+class SaleSupportTaskManager(InMemoryTaskManager):
     """
     🧠 This class connects the Gemini agent to the task system.
 
@@ -49,7 +49,7 @@ class PhoneQuestionAnsweringTaskManager(InMemoryTaskManager):
     - It uses the Gemini agent to generate a response
     """
 
-    def __init__(self, agent: PhoneQuestionAnsweringAgent):
+    def __init__(self, agent: SaleSupportAgent):
         super().__init__()     # Call parent class constructor
         self.agent = agent     # Store the Gemini-based agent as a property
 

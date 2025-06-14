@@ -19,6 +19,7 @@ from server.server import A2AServer
 from models.agent import AgentCard, AgentCapabilities, AgentSkill
 from starlette.middleware import Middleware
 from middleware.auth import AuthMiddleware
+from starlette.middleware.cors import CORSMiddleware
 from database.database import Database  # Custom database connection manager
 # Orchestrator implementation and its task manager
 from agents.host_agent.orchestrator import (
@@ -135,8 +136,15 @@ def main(host: str, port: int, registry: str):
 
     # 4) Create and start the A2A server
     middleware_list = [
-        Middleware(AuthMiddleware, db=db, settings=SETTINGS)
-    ]
+    Middleware(
+        CORSMiddleware,
+        allow_origins=["*"],  # Hoặc cụ thể: ["http://127.0.0.1:5500"]
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    ),
+    # Middleware(AuthMiddleware, db=db, settings=SETTINGS),
+]
     startup_handlers = [
         db.connect
     ]
@@ -150,8 +158,8 @@ def main(host: str, port: int, registry: str):
         agent_card=orchestrator_card,
         task_manager=task_manager,
         middleware=middleware_list,       
-        on_startup=startup_handlers,   
-        on_shutdown=shutdown_handlers   
+        # on_startup=startup_handlers,   
+        # on_shutdown=shutdown_handlers   
     )
     server.start()
 

@@ -225,7 +225,7 @@ def seed_milvus_data():
             embeddings_to_insert.append(embedding)
             texts_to_insert.append(item["text"])
             if SOURCE_FIELD_NAME:
-                sources_to_insert.append(item.get("source", "N/A"))
+                sources_to_insert.append(item.get("source"))
             print(f"  Generated embedding for ID: {item['id']}")
         else:
             print(f"  Skipping ID: {item['id']} due to embedding failure.")

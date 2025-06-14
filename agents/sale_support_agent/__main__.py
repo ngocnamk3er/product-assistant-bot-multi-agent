@@ -23,8 +23,8 @@ from server.server import A2AServer
 from models.agent import AgentCard, AgentCapabilities, AgentSkill
 
 # Task manager and agent logic
-from agents.phone_qa_agent.task_manager import PhoneQuestionAnsweringTaskManager
-from agents.phone_qa_agent.agent import PhoneQuestionAnsweringAgent
+from agents.sale_support_agent.task_manager import SaleSupportTaskManager
+from agents.sale_support_agent.agent import SaleSupportAgent
 
 # CLI and logging support
 import click           # For creating a clean command-line interface
@@ -66,11 +66,11 @@ def main(host, port):
     # Create an agent card describing this agent’s identity and metadata
     agent_card = AgentCard(
         name="Phone Question Answering Agent",                               # Name of the agent
-        description="Trả lời người dùng về các sản phẩm điện thoại hiện có",  # Description
+        description="Trả lời người dùng về các sản phẩm điện thoại",  # Description
         url=f"http://{public_hostname}:{port}/",                       # The public URL where this agent lives
         version="1.0.0",                                    # Version number
-        defaultInputModes=PhoneQuestionAnsweringAgent.SUPPORTED_CONTENT_TYPES,  # Input types this agent supports
-        defaultOutputModes=PhoneQuestionAnsweringAgent.SUPPORTED_CONTENT_TYPES, # Output types it produces
+        defaultInputModes=SaleSupportAgent.SUPPORTED_CONTENT_TYPES,  # Input types this agent supports
+        defaultOutputModes=SaleSupportAgent.SUPPORTED_CONTENT_TYPES, # Output types it produces
         capabilities=capabilities,                          # Supported features (e.g., streaming)
         skills=[skill]                                      # List of skills it supports
     )
@@ -79,7 +79,7 @@ def main(host, port):
         host=host,
         port=port,
         agent_card=agent_card,
-        task_manager=PhoneQuestionAnsweringTaskManager(agent=PhoneQuestionAnsweringAgent())
+        task_manager=SaleSupportTaskManager(agent=SaleSupportAgent())
     )
 
     # Start listening for tasks

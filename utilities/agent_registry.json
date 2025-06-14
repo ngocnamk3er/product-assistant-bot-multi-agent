@@ -1,6 +1,7 @@
 {
     "host_agent" : "http://localhost:10000",
     "greeting_agent" : "http://localhost:10001",
-    "telltime_agent" : "http://localhost:10002",
-    "event_introduction_agent" : "http://localhost:10003"
+    "event_introduction_agent" : "http://localhost:10003",
+    "policy_qa_agent" : "http://localhost:10004",
+    "sell_support_agent" : "http://localhost:10005"
 }

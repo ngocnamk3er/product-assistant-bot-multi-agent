@@ -14,6 +14,7 @@ from datetime import datetime  # Used to get the current system time
 
 # 🧠 Gemini-based AI agent provided by Google's ADK
 from google.adk.agents.llm_agent import LlmAgent
+from google import genai
 
 # 📚 ADK services for session, memory, and file-like "artifacts"
 from google.adk.sessions import InMemorySessionService
@@ -37,6 +38,11 @@ from dotenv import load_dotenv
 from pymilvus import connections, utility, Collection
 from google.genai.types import EmbedContentConfig
 
+
+# MCP server
+from google.adk.artifacts.in_memory_artifact_service import InMemoryArtifactService # Optional
+from google.adk.tools.mcp_tool.mcp_toolset import MCPToolset, SseServerParams, StdioServerParameters
+
 load_dotenv()  # Load variables like GOOGLE_API_KEY into the system
 
 # -----------------------------------------------------------------------------
@@ -58,13 +64,10 @@ EMBEDDING_MODEL_NAME = "embedding-001"  # Or "models/text-embedding-004" etc.
 VECTOR_FIELD_NAME = (
     "embedding"  # <<< THAY THẾ BẰNG TÊN TRƯỜNG VECTOR TRONG COLLECTION CỦA BẠN
 )
-TEXT_CONTENT_FIELD_NAMES = [
-    "name",
-    "formatted_specs",
-    "price"
-]
+TEXT_CONTENT_FIELD_NAMES = ["name", "formatted_specs", "price"]
 SOURCE_FIELD_NAME = "url"  # <<< TÙY CHỌN: TÊN TRƯỜNG CHỨA NGUỒN GỐC
 TOP_K_RESULTS = 5
+GENAI_MODEL_NAME = "gemini-2.5-flash-preview-05-20"  # Model for LLM tasks
 
 # -----------------------------------------------------------------------------
 # 🛠️ Helper Functions for Milvus Tool
@@ -89,114 +92,6 @@ def get_text_embedding(text: str, task_type="RETRIEVAL_QUERY") -> list[float]:
         return []
 
 
-def search_milvus_knowledge_base(search_query: str) -> str:
-    """
-    Searches a Milvus knowledge base for information relevant to the search_query.
-
-    Args:
-        search_query (str): The user's query to search for in the knowledge base.
-
-    Returns:
-        str: A string containing the search results, or a message if no results are found or an error occurs.
-    """
-    try:
-        # 1. Connect to Milvus (consider managing connection lifecycle better for production)
-        print(f"Connecting to Milvus at {MILVUS_HOST}:{MILVUS_PORT}")
-        connections.connect(
-            alias="default",
-            host=MILVUS_HOST,
-            port=MILVUS_PORT,
-            # user=MILVUS_USER, # Uncomment for auth
-            # password=MILVUS_PASSWORD, # Uncomment for auth
-        )
-        print("Successfully connected to Milvus.")
-
-        # 2. Check if collection exists
-        if not utility.has_collection(MILVUS_COLLECTION_NAME, using="default"):
-            return f"Milvus collection '{MILVUS_COLLECTION_NAME}' not found."
-
-        collection = Collection(MILVUS_COLLECTION_NAME, using="default")
-        collection.load()  # Load collection into memory for searching
-        print(
-            f"Collection '{MILVUS_COLLECTION_NAME}' loaded. Num entities: {collection.num_entities}"
-        )
-
-        # 3. Generate embedding for the search query
-        print(f"Generating embedding for query: '{search_query}'")
-        query_embedding = get_text_embedding(search_query)
-        if not query_embedding:
-            return "Failed to generate embedding for the search query."
-
-        # 4. Perform search
-        search_params = {
-            "metric_type": "COSINE",  # Or "IP" (Inner Product) depending on your data/preference
-            "params": {
-                "nprobe": 10
-            },  # Example search param, adjust based on your index type
-        }
-
-        output_fields = TEXT_CONTENT_FIELD_NAMES
-        if SOURCE_FIELD_NAME:  # Only include source if it's configured
-            # Ensure SOURCE_FIELD_NAME is part of your collection schema if you use it
-            if SOURCE_FIELD_NAME in [field.name for field in collection.schema.fields]:
-                output_fields.append(SOURCE_FIELD_NAME)
-            else:
-                print(
-                    f"Warning: SOURCE_FIELD_NAME '{SOURCE_FIELD_NAME}' not found in collection schema. It will not be retrieved."
-                )
-
-        print(
-            f"Searching Milvus with vector, top_k={TOP_K_RESULTS}, output_fields={output_fields}"
-        )
-        results = collection.search(
-            data=[query_embedding],
-            anns_field=VECTOR_FIELD_NAME,
-            param=search_params,
-            limit=TOP_K_RESULTS,
-            expr=None,  # Optional: filter expression
-            output_fields=output_fields,
-            consistency_level="Strong",  # Or "Bounded"
-        )
-
-        collection.release()  # Release collection from memory
-        print("Search complete. Collection released.")
-
-        # 5. Format results
-        if not results or not results[0]:
-            return "No relevant information found in the knowledge base for your query."
-
-        formatted_results = "Found the following information from the knowledge base:\n"
-        for i, hit in enumerate(results[0]):
-             formatted_results += f"\nResult {i+1} (Score: {hit.distance:.4f}):\n"
-
-        # SỬA Ở ĐÂY: Lấy từng trường trong TEXT_CONTENT_FIELD_NAMES
-        content_parts = []
-        for field_name in TEXT_CONTENT_FIELD_NAMES:
-            value = hit.entity.get(field_name, "N/A")
-            # Tùy chỉnh cách hiển thị tên trường nếu muốn (ví dụ: viết hoa chữ cái đầu)
-            display_field_name = field_name.replace("_", " ").capitalize()
-            content_parts.append(f"{display_field_name}: {value}")
-            content_str = "\n".join(content_parts)
-
-            formatted_results += f"Content:\n{content_str}\n"
-            if SOURCE_FIELD_NAME and SOURCE_FIELD_NAME in output_fields:
-                source = hit.entity.get(SOURCE_FIELD_NAME, "N/A")
-                formatted_results += f"Source: {source}\n"
-
-        return formatted_results
-
-    except Exception as e:
-        print(f"Error during Milvus search: {e}")
-        import traceback
-
-        traceback.print_exc()
-        return f"An error occurred while searching the knowledge base: {str(e)}"
-    finally:
-        try:
-            connections.disconnect("default")
-            print("Disconnected from Milvus.")
-        except Exception as e:
-            print(f"Error disconnecting from Milvus: {e}")
 
 
 # -----------------------------------------------------------------------------
@@ -204,7 +99,7 @@ def search_milvus_knowledge_base(search_query: str) -> str:
 # -----------------------------------------------------------------------------
 
 
-class PhoneQuestionAnsweringAgent:
+class SaleSupportAgent:
     SUPPORTED_CONTENT_TYPES = ["text", "text/plain"]
 
     def __init__(self):
@@ -227,23 +122,43 @@ class PhoneQuestionAnsweringAgent:
         ) -> int:  # Fixed typo: "leng" to "length"
             return len(text)
 
+        toolset = MCPToolset(
+            # Use StdioServerParameters for local process communication
+            connection_params=SseServerParams(url="http://localhost:30000/sse"),
+        )
+
         # Create FunctionTool for Milvus search
         # The ADK will infer the schema from the function's signature and docstring
-        milvus_kb_tool = FunctionTool(search_milvus_knowledge_base)
-
+        # milvus_kb_tool = FunctionTool(search_milvus_knowledge_base)
         return LlmAgent(
             model="gemini-2.5-flash-preview-05-20",
-            name="phone_policy_question_answer_agent",
-            description="Trợ lý AI chuyên cung cấp thông tin  điện thoại trong cơ sỡ diệu liệu của công ty",
+            name="phone_question_answer_agent",
+            description="Trợ lý AI chuyên nghiệp hỗ trợ việc tư vấn sản phầm và đặt hàng điện thoại di động.",
+            # instruction=(
+            #     "Bạn là trợ lý AI chuyên về trả lời các câu hỏi liên quan về điện thoại di động, thực hiện theo các trường hợp sau "
+            #     "Trường hợp 1: Nếu câu hỏi của người dùng chỉ liên quan duy nhất đến việc tìm kiếm các sản phẩm điện thoại di động, "
+            #     "Bước 1: Tách từ truy vấn hợp lí từ câu hỏi của người dùng, ví dụ: "
+            #     '"Tìm cho tôi thông tin về Iphone 15" sẽ được tách thành "Iphone 15". '
+            #     'Bước 2: Tìm kiếm trong cơ sở dữ liệu Milvus bằng tool "search_milvus_knowledge_base" để lấy thông tin về sản phẩm điện thoại di động phù hợp với truy vấn. '
+            #     "Bước 3: Trả lời người dùng bằng cách cung cấp thông tin chi tiết về sản phẩm, bao gồm tên, thông số kỹ thuật và giá cả. "
+            #     "Trường hợp 2: Nếu câu hỏi của người dùng liên quan đến việc Create, Read, Update, Delete (CRUD) dữ liệu trong cơ sở dữ liệu, "
+            #     "Bước 1: Tách từ truy vấn hợp lí từ câu hỏi của người dùng, ví dụ: "
+            #     'Bước 2:Nếu cảm thấy cần thiết thì Tìm kiếm trong cơ sở dữ liệu Milvus bằng tool "search_milvus_knowledge_base" để lấy thông tin về sản phẩm điện thoại di động phù hợp với truy vấn. '
+            #     "Bước 3: Sử dụng tool 'generate_sql_from_schema_and_question' để chuyển đổi câu hỏi của người dùng thành câu lệnh SQL phù hợp với cơ sở dữ liệu. "
+            #     "Bước 4: Trả lời người dùng bằng cách cung cấp câu lệnh SQL đã chuyển đổi. "
+            # ),
             instruction=(
-                "Bạn là trợ lý AI chuyên về trả lời các câu hỏi liên quan về điện thoại di động, thực hiện theo các bước sau "
-                "Bước 1: không lấy hết câu hỏi người dùng mà phải tách từ khóa từ câu hỏi của người dùng để làm từ truy vấn"
-                "Bước 2: Sử dụng công cụ 'search_milvus_knowledge_base' để tìm kiếm thông tin trong cơ sở dữ liệu."
-                "Bước 3: Dựa trên kết quả tìm kiếm, trả lời câu hỏi của người dùng một cách chính xác và đầy đủ."
-                "Nếu công cụ tìm kiếm không trả về thông tin liên quan, hãy thông báo cho người dùng rằng bạn không tìm thấy thông tin trong cơ sở dữ liệu."
+                "Bạn là trợ lý AI chuyên về trả lời các câu hỏi liên quan về điện thoại di động, thực hiện theo các trường hợp sau "
+                "Nếu câu hỏi của người dùng liên quan đến việc tìm kiếm các sản phẩm điện thoại di động, "
+                "Bước 1: Tách từ truy vấn hợp lí từ câu hỏi của người dùng, ví dụ: "
+                '"Tìm cho tôi thông tin về Iphone 15" sẽ được tách thành "Iphone 15". '
+                'Bước 2: Tìm kiếm trong cơ sở dữ liệu Milvus bằng tool "search_milvus_knowledge_base" để lấy thông tin về sản phẩm điện thoại di động phù hợp với truy vấn. '
+                "Bước 3: Trả lời người dùng"
             ),
             tools=[
-                milvus_kb_tool,  # Add the new Milvus tool
+                toolset,
+                # milvus_kb_tool,
+                # converted_user_question_to_sql_tool,
             ],
         )
 
@@ -284,11 +199,10 @@ class PhoneQuestionAnsweringAgent:
 
 # --- Example Usage (for testing locally) ---
 async def main():
-    agent = PhoneQuestionAnsweringAgent()
+    agent = SaleSupportAgent()
     session_id = "test_session_milvus_001"
 
     print("Agent initialized. Type 'quit' to exit.")
-
 
     while True:
         user_query = input("You: ")
@@ -305,4 +219,5 @@ async def main():
 
 if __name__ == "__main__":
     import asyncio
+
     asyncio.run(main())

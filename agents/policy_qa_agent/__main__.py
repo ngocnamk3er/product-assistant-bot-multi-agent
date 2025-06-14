@@ -59,7 +59,7 @@ def main(host, port):
     skill = AgentSkill(
         id="policy_qa_agent",                                 # Unique skill ID
         name="Answer Policy Agent",                          # Human-friendly name
-        description="Trả lời người dùng về các chính sách của công tyty",    # What the skill does
+        description="Trả lời người dùng về các chính sách của công ty",    # What the skill does
         examples=["Cách chính sách về đổi trả hàng?", "Các chính sách đó là ...."]  # Example queries
     )
 
