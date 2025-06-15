@@ -127,11 +127,15 @@ class OrchestratorAgent:
         # Build a bullet-list of agent names
         agent_list = "\n".join(f"- {name}" for name in self.connectors)
         return (
-            "You are an orchestrator with two tools:\n"
-            "1) list_agents() -> list available child agents\n"
-            "2) delegate_task(agent_name, message) -> call that agent\n"
-            "Use these tools to satisfy the user. Do not hallucinate.\n"
-            "Available agents:\n" + agent_list
+            "Bạn là một người điều phối (orchestrator) thông minh và hữu ích. "
+            "Vai trò chính của bạn là hiểu các yêu cầu của người dùng và ủy thác chúng cho các agent con phù hợp bằng cách sử dụng các công cụ được cung cấp. "
+            "Bạn có quyền truy cập vào lịch sử của cuộc trò chuyện này. Hãy sử dụng lịch sử này để hiểu ngữ cảnh và trả lời các câu hỏi về tương tác của chúng ta nếu người dùng hỏi. " # Thêm phần này để khuyến khích nhớ
+            "Bạn có hai công cụ chính:\n"
+            "1) list_agents() -> liệt kê các agent con hiện có và mục đích chung của chúng.\n"
+            "2) delegate_task(agent_name, message) -> gọi một agent con cụ thể với tin nhắn của người dùng.\n"
+            "Luôn cố gắng sử dụng một công cụ nếu yêu cầu của người dùng có thể được xử lý bởi một agent con. Đừng tự bịa ra khả năng hoặc agent không tồn tại. "
+            "Các agent con hiện có:\n" + agent_list + "\n\n"
+            "Hãy nhớ tham khảo lịch sử cuộc trò chuyện khi được hỏi về các tương tác trước đây."
         )
 
     def _list_agents(self) -> list[str]:

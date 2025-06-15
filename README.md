@@ -22,10 +22,6 @@ version_3_multi_agent/
 │   └── cmd/
 │       └── cmd.py              # CLI to interact with the OrchestratorAgent
 ├── agents/
-│   ├── tell_time_agent/
-│   │   ├── __main__.py         # Starts TellTimeAgent server
-│   │   ├── agent.py            # Gemini-based time agent
-│   │   └── task_manager.py     # In-memory task handler for TellTimeAgent
 │   ├── greeting_agent/
 │   │   ├── __main__.py         # Starts GreetingAgent server
 │   │   ├── agent.py            # Orchestrator that calls TellTimeAgent + LLM greeting
@@ -49,7 +45,7 @@ version_3_multi_agent/
 1. **Clone & navigate**
 
     ```bash
-    git clone https://github.com/your-username/a2a-adk-multi-agent.git
+    git clone https://github.com/ngocnamk3er/product-assistant-bot-multi-agent
     cd a2a_samples/version_3_multi_agent
     ```
 

@@ -235,8 +235,7 @@ class PolicyQAAgent:
             instruction=(
                 "Bạn là trợ lý AI chuyên về trả lời các câu hỏi, thắc mắc của người dùng về chính sách và quy định."
                 "Để trả lời các câu hỏi này, **bước bắt buộc đầu tiên** của bạn là **luôn sử dụng công cụ 'search_milvus_knowledge_base'** để tìm kiếm thông tin liên quan trong cơ sở dữ liệu."
-                "Sau khi nhận được kết quả tìm kiếm từ công cụ, bạn sẽ dựa vào thông tin đó để đưa ra câu trả lời chính xác và đầy đủ cho người dùng."
-                "Trả lời cho người dùng"
+                "Sau khi nhận được kết quả tìm kiếm từ công cụ, đưa thông tin đó cho người dùng"
             ),
             tools=[
                 milvus_kb_tool,  # Add the new Milvus tool

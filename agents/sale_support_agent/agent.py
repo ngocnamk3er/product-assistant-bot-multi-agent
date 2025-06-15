@@ -74,22 +74,22 @@ GENAI_MODEL_NAME = "gemini-2.5-flash-preview-05-20"  # Model for LLM tasks
 # -----------------------------------------------------------------------------
 
 
-def get_text_embedding(text: str, task_type="RETRIEVAL_QUERY") -> list[float]:
-    """Generates embedding for the given text using Google's API."""
-    try:
-        result = genai.Client().models.embed_content(
-            model=EMBEDDING_MODEL_NAME,
-            contents=text,
-            config=EmbedContentConfig(
-                task_type="RETRIEVAL_DOCUMENT",  # Optional
-                output_dimensionality=768,  # Optional
-            ),
-        )
-        # print(f"Generated embedding for text: {result.embeddings[0].values}")  # Debugging
-        return result.embeddings[0].values
-    except Exception as e:
-        print(f"Error generating embedding: {e}")
-        return []
+# def get_text_embedding(text: str, task_type="RETRIEVAL_QUERY") -> list[float]:
+#     """Generates embedding for the given text using Google's API."""
+#     try:
+#         result = genai.Client().models.embed_content(
+#             model=EMBEDDING_MODEL_NAME,
+#             contents=text,
+#             config=EmbedContentConfig(
+#                 task_type="RETRIEVAL_DOCUMENT",  # Optional
+#                 output_dimensionality=768,  # Optional
+#             ),
+#         )
+#         # print(f"Generated embedding for text: {result.embeddings[0].values}")  # Debugging
+#         return result.embeddings[0].values
+#     except Exception as e:
+#         print(f"Error generating embedding: {e}")
+#         return []
 
 
 
