@@ -94,24 +94,24 @@ version_3_multi_agent/
 ## 🧱 Kiến trúc hệ thống
 
 ### A2A MCP Architecture
-![A2A MCP Architecture](images/a2a_mcp_architecture.png)
+![A2A MCP Architecture](https://github.com/ngocnamk3er/product-assistant-bot-multi-agent/blob/main/images/a2a_mcp_architecture.png)
 
 ### Chatbot App Architecture
-![Chatbot App Architecture](images/chatbot_app_architecture.png)
+![Chatbot App Architecture](https://github.com/ngocnamk3er/product-assistant-bot-multi-agent/blob/main/images/chatbot_app_architecture.png)
 
 ## 📸 Demo minh họa
 
 ### Demo 1
-![Demo 1](images/demo1.png)
+![Demo 1](https://github.com/ngocnamk3er/product-assistant-bot-multi-agent/blob/main/images/demo1.png)
 
 ### Demo 2
-![Demo 2](images/demo2.png)
+![Demo 2](https://github.com/ngocnamk3er/product-assistant-bot-multi-agent/blob/main/images/demo2.png)
 
 ### Demo 3
-![Demo 3](images/demo3.png)
+![Demo 3](https://github.com/ngocnamk3er/product-assistant-bot-multi-agent/blob/main/images/demo3.png)
 
 ### Demo 4
-![Demo 4](images/demo4.png)
+![Demo 4](https://github.com/ngocnamk3er/product-assistant-bot-multi-agent/blob/main/images/demo4.png)
 
 ## 🎬 Demo Walkthrough
 
