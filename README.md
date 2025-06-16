@@ -23,13 +23,25 @@ version_3_multi_agent/
 │       └── cmd.py              # CLI to interact with the OrchestratorAgent
 ├── agents/
 │   ├── greeting_agent/
-│   │   ├── __main__.py         # Starts GreetingAgent server
-│   │   ├── agent.py            # Orchestrator that calls TellTimeAgent + LLM greeting
-│   │   └── task_manager.py     # Task handler for GreetingAgent
+│   │   ├── __main__.py         
+│   │   ├── agent.py            
+│   │   └── task_manager.py     
+│   ├── sale_support_agent/
+│   │   ├── __main__.py         
+│   │   ├── agent.py            
+│   │   └── task_manager.py     
+│   ├── event_introduction_agent/
+│   │   ├── __main__.py         
+│   │   ├── agent.py            
+│   │   └── task_manager.py     
+│   ├── policy_qa_agent/
+│   │   ├── __main__.py         
+│   │   ├── agent.py            
+│   │   └── task_manager.py     
 │   └── host_agent/
-│       ├── entry.py            # CLI to start OrchestratorAgent server
-│       ├── orchestrator.py     # LLM router + TaskManager for OrchestratorAgent
-│       └── agent_connect.py    # Helper to call child A2A agents
+│       ├── entry.py            
+│       ├── orchestrator.py     
+│       └── agent_connect.py    
 ├── server/
 │   ├── server.py               # A2A JSON-RPC server implementation
 │   └── task_manager.py         # Base in-memory task manager interface
@@ -78,6 +90,28 @@ version_3_multi_agent/
     ```
 
 ---
+
+## 🧱 Kiến trúc hệ thống
+
+### A2A MCP Architecture
+![A2A MCP Architecture](images/a2a_mcp_architecture.png)
+
+### Chatbot App Architecture
+![Chatbot App Architecture](images/chatbot_app_architecture.png)
+
+## 📸 Demo minh họa
+
+### Demo 1
+![Demo 1](images/demo1.png)
+
+### Demo 2
+![Demo 2](images/demo2.png)
+
+### Demo 3
+![Demo 3](images/demo3.png)
+
+### Demo 4
+![Demo 4](images/demo4.png)
 
 ## 🎬 Demo Walkthrough
 
