@@ -97,7 +97,7 @@ version_3_multi_agent/
 ![A2A MCP Architecture](https://raw.githubusercontent.com/ngocnamk3er/product-assistant-bot-multi-agent/main/image/a2a_mcp_architecture.png)
 
 ### Chatbot App Architecture
-![Chatbot App Architecture](https://raw.githubusercontent.com/ngocnamk3er/product-assistant-bot-multi-agent/main/image/chatbot_app_architecture.png)
+![Chatbot App Architecture](https://raw.githubusercontent.com/ngocnamk3er/product-assistant-bot-multi-agent/main/image/chatbot_app_architechture.png)
 
 ## 📸 Demo minh họa
 
